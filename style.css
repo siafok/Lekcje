@@ -73,7 +73,7 @@ body {
 
 .btn-primary:hover {
     background-color: var(--primary-hover);
-    box-shadow: 0 4px 12px rgba(200, 16, 46, 0.3);
+    box-shadow: 0 4px 12px #072b14;
 }
 
 .btn-secondary {
