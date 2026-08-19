@@ -16,7 +16,7 @@
         </div>
 
         <div class="instructions">
-            Kliknij po lewej, a potem po prawej. Aby posłuchać wymowy, kliknij głośnik.
+            Kliknij w pierwszej kolumnie, a potem w drugiej. Aby posłuchać wymowy, kliknij głośnik.
         </div>
 
         <div class="matching-grid">
@@ -26,10 +26,12 @@
                 <div class="item-list" id="left-col">
                     <div class="card-item" data-match="read"><span class="item-text">&#128214; &#128483;</span></div>
                     <div class="card-item" data-match="write"><span class="item-text">&#9999;<strong>Abc</strong></span></div>
-                    <div class="card-item" data-match="repeat"><span class="item-text">&#128260; &#128483;</span></div>
+                    <div class="card-item" data-match="repeat"><span class="item-text">&#128483; &#128260; &#128483;</span></div>
                     <div class="card-item" data-match="spell"><span class="item-text">a-b-c</span></div>
                     <div class="card-item" data-match="underline"><span class="item-text">&#9999;<u><strong>abc</strong></u></span></div>
                     <div class="card-item" data-match="match"><span class="item-text">&#129513;&#8596;&#129513;</span></div>
+                    <div class="card-item" data-match="fill"><span class="item-text">A_c &#11013; b</span></div>
+                    <div class="card-item" data-match="listen"><span class="item-text">&#128483; &#128066;</span></div>
                 </div>
             </div>
 
@@ -39,27 +41,35 @@
                 <div class="item-list" id="right-col">
                     <div class="card-item" data-match="repeat">
                         <span class="item-text">Proszę powtórzyć</span>
-                        <button class="audio-btn" onclick="speak('Proszę powtórzyć', event)" title="Posłuchaj wymowy">🔊</button>
+                        <button class="audio-btn" onclick="speak('Proszę powtórzyć', event)" title="Posłuchaj wymowy">&#128266;</button>
                     </div>
                     <div class="card-item" data-match="read">
                         <span class="item-text">Proszę przeczytać</span>
-                        <button class="audio-btn" onclick="speak('Proszę przeczytać', event)" title="Posłuchaj wymowy">🔊</button>
+                        <button class="audio-btn" onclick="speak('Proszę przeczytać', event)" title="Posłuchaj wymowy">&#128266;</button>
                     </div>
                     <div class="card-item" data-match="match">
                         <span class="item-text">Proszę dopasować</span>
-                        <button class="audio-btn" onclick="speak('Proszę dopasować', event)" title="Posłuchaj wymowy">🔊</button>
+                        <button class="audio-btn" onclick="speak('Proszę dopasować', event)" title="Posłuchaj wymowy">&#128266;</button>
+                    </div>
+                    <div class="card-item" data-match="fill">
+                        <span class="item-text">Proszę uzupełnić</span>
+                        <button class="audio-btn" onclick="speak('Proszę uzupełnić', event)" title="Posłuchaj wymowy">&#128266;</button>
+                    </div>
+                    <div class="card-item" data-match="listen">
+                        <span class="item-text">Proszę posłuchać</span>
+                        <button class="audio-btn" onclick="speak('Proszę posłuchać', event)" title="Posłuchaj wymowy">&#128266;</button>
                     </div>
                     <div class="card-item" data-match="spell">
                         <span class="item-text">Proszę przeliterować</span>
-                        <button class="audio-btn" onclick="speak('Proszę przeliterować', event)" title="Posłuchaj wymowy">🔊</button>
+                        <button class="audio-btn" onclick="speak('Proszę przeliterować', event)" title="Posłuchaj wymowy">&#128266;</button>
                     </div>
                     <div class="card-item" data-match="write">
                         <span class="item-text">Proszę napisać</span>
-                        <button class="audio-btn" onclick="speak('Proszę napisać', event)" title="Posłuchaj wymowy">🔊</button>
+                        <button class="audio-btn" onclick="speak('Proszę napisać', event)" title="Posłuchaj wymowy">&#128266;</button>
                     </div>
                     <div class="card-item" data-match="underline">
                         <span class="item-text">Proszę podkreślić</span>
-                        <button class="audio-btn" onclick="speak('Proszę podkreślić', event)" title="Posłuchaj wymowy">🔊</button>
+                        <button class="audio-btn" onclick="speak('Proszę podkreślić', event)" title="Posłuchaj wymowy">&#128266;</button>
                     </div>
                 </div>
             </div>
