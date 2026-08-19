@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ćwiczenie: Polecenia w klasie</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="exercise-wrapper">
+    <div class="app-container">
+        <div class="header">
+            <h1>Polecenia na lekcji</h1>
+            <p>Słownictwo z zakresu instrukcji klasowych</p>
+        </div>
+
+        <div class="instructions">
+            Kliknij po lewej, a potem po prawej. Aby posłuchać wymowy, kliknij głośnik.
+        </div>
+
+        <div class="matching-grid">
+            <!-- Kolumna 1: Symbole -->
+            <div class="column">
+                <div class="column-title">Symbole</div>
+                <div class="item-list" id="left-col">
+                    <div class="card-item" data-match="read"><span class="item-text">&#128214; &#128483;</span></div>
+                    <div class="card-item" data-match="write"><span class="item-text">&#9999;<strong>Abc</strong></span></div>
+                    <div class="card-item" data-match="repeat"><span class="item-text">&#128260; &#128483;</span></div>
+                    <div class="card-item" data-match="spell"><span class="item-text">a-b-c</span></div>
+                    <div class="card-item" data-match="underline"><span class="item-text">&#9999;<u><strong>abc</strong></u></span></div>
+                    <div class="card-item" data-match="match"><span class="item-text">&#129513;&#8596;&#129513;</span></div>
+                </div>
+            </div>
+
+            <!-- Kolumna 2: Tekst z wymową -->
+            <div class="column">
+                <div class="column-title">Polecenia</div>
+                <div class="item-list" id="right-col">
+                    <div class="card-item" data-match="repeat">
+                        <span class="item-text">Proszę powtórzyć</span>
+                        <button class="audio-btn" onclick="speak('Proszę powtórzyć', event)" title="Posłuchaj wymowy">🔊</button>
+                    </div>
+                    <div class="card-item" data-match="read">
+                        <span class="item-text">Proszę przeczytać</span>
+                        <button class="audio-btn" onclick="speak('Proszę przeczytać', event)" title="Posłuchaj wymowy">🔊</button>
+                    </div>
+                    <div class="card-item" data-match="match">
+                        <span class="item-text">Proszę dopasować</span>
+                        <button class="audio-btn" onclick="speak('Proszę dopasować', event)" title="Posłuchaj wymowy">🔊</button>
+                    </div>
+                    <div class="card-item" data-match="spell">
+                        <span class="item-text">Proszę przeliterować</span>
+                        <button class="audio-btn" onclick="speak('Proszę przeliterować', event)" title="Posłuchaj wymowy">🔊</button>
+                    </div>
+                    <div class="card-item" data-match="write">
+                        <span class="item-text">Proszę napisać</span>
+                        <button class="audio-btn" onclick="speak('Proszę napisać', event)" title="Posłuchaj wymowy">🔊</button>
+                    </div>
+                    <div class="card-item" data-match="underline">
+                        <span class="item-text">Proszę podkreślić</span>
+                        <button class="audio-btn" onclick="speak('Proszę podkreślić', event)" title="Posłuchaj wymowy">🔊</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="feedback" class="feedback-box"></div>
+
+        <div class="actions">
+            <button class="btn btn-secondary" onclick="resetExercise()">↻ Zacznij od nowa</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let selectedLeft = null;
+    let selectedRight = null;
+    let matchedPairs = 0;
+    const totalPairs = 6;
+
+    const leftItems = document.querySelectorAll('#left-col .card-item');
+    const rightItems = document.querySelectorAll('#right-col .card-item');
+    const feedbackBox = document.getElementById('feedback');
+
+    function handleSelection(item, col) {
+        if (item.classList.contains('matched')) return;
+
+        if (col === 'left') {
+            if (selectedLeft) selectedLeft.classList.remove('selected');
+            selectedLeft = item;
+        } else {
+            if (selectedRight) selectedRight.classList.remove('selected');
+            selectedRight = item;
+        }
+
+        item.classList.add('selected');
+
+        if (selectedLeft && selectedRight) {
+            checkMatch();
+        }
+    }
+
+    function checkMatch() {
+        const leftMatch = selectedLeft.getAttribute('data-match');
+        const rightMatch = selectedRight.getAttribute('data-match');
+
+        const leftEl = selectedLeft;
+        const rightEl = selectedRight;
+
+        selectedLeft = null;
+        selectedRight = null;
+
+        if (leftMatch === rightMatch) {
+            leftEl.classList.replace('selected', 'correct');
+            rightEl.classList.replace('selected', 'correct');
+            
+            setTimeout(() => {
+                leftEl.classList.replace('correct', 'matched');
+                rightEl.classList.replace('correct', 'matched');
+                matchedPairs++;
+                
+                if (matchedPairs === totalPairs) {
+                    feedbackBox.textContent = "Świetnie! Wszystkie polecenia zostały dopasowane prawidłowo.";
+                    feedbackBox.className = "feedback-box success";
+                }
+            }, 500);
+        } else {
+            leftEl.classList.replace('selected', 'incorrect');
+            rightEl.classList.replace('selected', 'incorrect');
+
+            setTimeout(() => {
+                leftEl.classList.remove('incorrect');
+                rightEl.classList.remove('incorrect');
+            }, 800);
+        }
+    }
+
+    function resetExercise() {
+        const allItems = document.querySelectorAll('.card-item');
+        allItems.forEach(item => {
+            item.classList.remove('selected', 'matched', 'correct', 'incorrect');
+        });
+        
+        selectedLeft = null;
+        selectedRight = null;
+        matchedPairs = 0;
+        
+        feedbackBox.className = "feedback-box";
+        feedbackBox.style.display = "none";
+    }
+
+    function speak(text, event) {
+        event.stopPropagation();
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'pl-PL';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert('Twoja przeglądarka nie wspiera syntezatora mowy.');
+        }
+    }
+
+    leftItems.forEach(item => {
+        item.addEventListener('click', () => handleSelection(item, 'left'));
+    });
+
+    rightItems.forEach(item => {
+        item.addEventListener('click', () => handleSelection(item, 'right'));
+    });
+</script>
+
+</body>
+</html>
