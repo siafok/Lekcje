@@ -3,625 +3,255 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ćwiczenie 1: Dopasuj pytanie do odpowiedzi - Język polski A1</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Język polski – ćwiczenia interaktywne</title>
     <style>
         :root {
-            --primary: #c8102e;
-            --primary-hover: #9b0b22;
-            --primary-light: #fff5f5;
-            --bg-body: #f8fafc;
+            --primary: #2b5b84;
+            --primary-hover: #1e4160;
+            --bg: #f4f7f9;
             --card-bg: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
+            --text: #2c3e50;
+            --text-light: #6c757d;
+            --accent: #e74c3c;
             --border: #e2e8f0;
-            --selected: #e0e7ff;
-            --selected-border: #6366f1;
-            --correct-bg: #f0fdf4;
-            --correct-border: #22c55e;
-            --correct-text: #15803d;
-            --incorrect-bg: #fef2f2;
-            --incorrect-border: #ef4444;
-            --incorrect-text: #b91c1c;
-            --radius-lg: 16px;
-            --radius-md: 12px;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-            --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         body {
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 24px 16px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
         }
 
-        .app-container {
-            width: 100%;
-            max-width: 800px;
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-hover);
-            padding: 32px;
-            border: 1px solid var(--border);
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
         }
 
-        .header {
+        header {
             text-align: center;
-            margin-bottom: 28px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid var(--primary-light);
+            margin-bottom: 40px;
+            padding: 30px 20px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-bottom: 4px solid var(--primary);
         }
 
-        .badge {
-            display: inline-block;
-            background-color: var(--primary-light);
+        header h1 {
             color: var(--primary);
-            font-weight: 700;
-            font-size: 0.85rem;
-            padding: 6px 14px;
-            border-radius: 20px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 12px;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
         }
 
-        .header h1 {
-            font-size: 1.75rem;
-            color: #0f172a;
-            margin-bottom: 8px;
-            font-weight: 700;
+        header p {
+            color: var(--text-light);
+            font-size: 1.1rem;
         }
 
-        .header p {
-            color: var(--text-muted);
+        .search-box {
+            margin-bottom: 30px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 14px 20px;
             font-size: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.2s;
         }
 
-        .matching-grid {
+        .search-box input:focus {
+            border-color: var(--primary);
+        }
+
+        .grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin-bottom: 28px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
         }
 
-        @media (max-width: 640px) {
-            .matching-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .column-title {
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .item-list {
+        .card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 24px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+            border: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            gap: 12px;
-        }
-
-        .card-item {
-            background: #fff;
-            border: 2px solid var(--border);
-            border-radius: var(--radius-md);
-            padding: 16px 20px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
             justify-content: space-between;
-            position: relative;
-            user-select: none;
-            min-height: 64px;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .card-item:hover {
-            border-color: #cbd5e1;
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
         }
 
-        .card-item.selected {
-            border-color: var(--selected-border);
-            background-color: var(--selected);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-        }
-
-        .card-item.matched {
-            border-color: #94a3b8;
-            background-color: #f1f5f9;
-        }
-
-        .card-item.correct {
-            border-color: var(--correct-border) !important;
-            background-color: var(--correct-bg) !important;
-            color: var(--correct-text) !important;
-        }
-
-        .card-item.incorrect {
-            border-color: var(--incorrect-border) !important;
-            background-color: var(--incorrect-bg) !important;
-            color: var(--incorrect-text) !important;
-        }
-
-        .item-text {
-            font-size: 1.05rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .audio-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--text-muted);
-            padding: 4px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: color 0.2s, background-color 0.2s;
-        }
-
-        .audio-btn:hover {
+        .card-tag {
+            display: inline-block;
+            align-self: flex-start;
+            background: #eef4f8;
             color: var(--primary);
-            background-color: var(--primary-light);
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .pair-badge {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background-color: #e2e8f0;
-            color: #475569;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.85rem;
-            flex-shrink: 0;
+        .card h2 {
+            font-size: 1.3rem;
+            color: var(--text);
+            margin-bottom: 10px;
         }
 
-        .actions {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 20px;
+        .card p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            flex-grow: 1;
         }
 
         .btn {
-            padding: 12px 24px;
-            font-size: 1rem;
-            font-weight: 600;
-            border-radius: var(--radius-md);
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
+            display: inline-block;
+            text-align: center;
             background-color: var(--primary);
             color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-            box-shadow: 0 4px 12px rgba(200, 16, 46, 0.3);
-        }
-
-        .btn-secondary {
-            background-color: #f1f5f9;
-            color: #334155;
-            border: 1px solid #cbd5e1;
-        }
-
-        .btn-secondary:hover {
-            background-color: #e2e8f0;
-        }
-
-        .feedback-box {
-            margin-top: 24px;
-            padding: 16px 20px;
-            border-radius: var(--radius-md);
-            text-align: center;
+            text-decoration: none;
+            padding: 10px 18px;
+            border-radius: 6px;
             font-weight: 600;
-            font-size: 1.1rem;
-            display: none;
-            animation: fadeIn 0.3s ease;
+            transition: background-color 0.2s;
         }
 
-        .feedback-box.success {
-            background-color: var(--correct-bg);
-            color: var(--correct-text);
-            border: 1px solid var(--correct-border);
+        .btn:hover {
+            background-color: var(--primary-hover);
         }
 
-        .feedback-box.error {
-            background-color: var(--incorrect-bg);
-            color: var(--incorrect-text);
-            border: 1px solid var(--incorrect-border);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .instructions {
-            background-color: #f8fafc;
-            border: 1px dashed #cbd5e1;
-            padding: 12px 16px;
-            border-radius: var(--radius-md);
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-bottom: 24px;
+        footer {
             text-align: center;
+            margin-top: 50px;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* Brak wyników wyszukiwania */
+        .no-results {
+            display: none;
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 8px;
+            color: var(--text-light);
         }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <div class="header">
-        <span class="badge">Język polski A1</span>
-        <h1>Lekcja 1</h1>
-        <p>Ćwiczenie 3: Dopasuj pytanie do odpowiedzi</p>
-    </div>
+    <div class="container">
+        <header>
+            <h1>Język polski – ćwiczenia</h1>
+            <p>Wybierz ćwiczenie z listy i przejdź do nauki!</p>
+        </header>
 
-    <div class="instructions">
-        💡 <strong>Jak rozwiązać ćwiczenie?</strong><br>Kliknij pytanie po lewej, a potem odpowiedź po prawej. Kliknij głośnik, aby posłuchać wymowy.
-    </div>
-
-    <div class="matching-grid">
-        <!-- Lewa kolumna: Pytania -->
-        <div>
-            <div class="column-title">
-                <span>💬 Pytanie</span>
-            </div>
-            <div class="item-list" id="questions-list">
-                <!-- Wygenerowane dynamicznie -->
-            </div>
+        <!-- Wyszukiwarka ćwiczeń -->
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Szukaj ćwiczenia (np. dopasowywanie, gramatyka)..." onkeyup="filterExercises()">
         </div>
 
-        <!-- Prawa kolumna: Odpowiedzi -->
-        <div>
-            <div class="column-title">
-                <span>💬 Odpowiedź</span>
+        <!-- Lista ćwiczeń -->
+        <div class="grid" id="exerciseGrid">
+
+            <!-- ============================================================ -->
+            <!-- TUTAJ DODAJESZ NOWE ĆWICZENIA (Skopiuj poniższy blok .card)  -->
+            <!-- ============================================================ -->
+
+            <!-- PRZYKŁAD 1 -->
+            <div class="card" data-title="dopasowywanie słownictwo słowa">
+                <div>
+                    <span class="card-tag">Słownictwo</span>
+                    <h2>Ćwiczenie 1</h2>
+                    <p>Przedstawianie się</p>
+                </div>
+                <a href="cwiczenie1.html" class="btn">Otwórz ćwiczenie</a>
             </div>
-            <div class="item-list" id="answers-list">
-                <!-- Wygenerowane dynamicznie -->
+
+<!--        
+            <div class="card" data-title="gramatyka przypadki biernik">
+                <div>
+                    <span class="card-tag">Gramatyka</span>
+                    <h2>Biernik – Uzupełnianie</h2>
+                    <p>Wpisz poprawne formy rzeczowników w bierniku.</p>
+                </div>
+                <a href="cwiczenie2.html" class="btn">Otwórz ćwiczenie</a>
+            </div> 
+-->
+
+<!--        
+            <div class="card" data-title="wymowa fonetyka akcent">
+                <div>
+                    <span class="card-tag">Wymowa</span>
+                    <h2>Akcent i Wymowa</h2>
+                    <p>Ćwiczenie prawidłowego akcentowania słów.</p>
+                </div>
+                <a href="cwiczenie3.html" class="btn">Otwórz ćwiczenie</a>
+            </div> 
+-->
+
+            <!-- ============================================================ -->
+            <!-- KONIEC MIEJSCA NA NOWE ĆWICZENIA                            -->
+            <!-- ============================================================ -->
+
+            <div class="no-results" id="noResults">
+                Nie znaleziono ćwiczenia pasującego do wyszukiwania.
             </div>
+
         </div>
+
+        <footer>
+            <p>&copy; siafok</p>
+        </footer>
     </div>
 
-    <div class="feedback-box" id="feedback"></div>
+    <script>
+        function filterExercises() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.card');
+            const noResults = document.getElementById('noResults');
+            let visibleCount = 0;
 
-    <div class="actions">
-        <button class="btn btn-primary" id="check-btn" onclick="checkAnswers()">Sprawdź odpowiedzi</button>
-        <button class="btn btn-secondary" onclick="resetExercise()">Zresetuj</button>
-        <button class="btn btn-secondary" onclick="showSolution()">Pokaż rozwiązanie</button>
-    </div>
-</div>
+            cards.forEach(card => {
+                const title = card.getAttribute('data-title').toLowerCase();
+                const content = card.innerText.toLowerCase();
 
-<script>
-    const data = [
-        { id: 1, question: "1. Jak masz na imię?", answer: "C. Mam na imię Tom." },
-        { id: 2, question: "2. Jak się pani nazywa?", answer: "A. Nazywam się Mira Kowalska." },
-        { id: 3, question: "3. Bardzo mi miło.", answer: "B. Miło mi cię poznać." }
-    ];
-
-    // Kolory par
-    const pairColors = ['#4f46e5', '#0891b2', '#d97706'];
-
-    let selectedQuestion = null;
-    let selectedAnswer = null;
-    let userPairs = {}; // questionId -> answerId
-    let isChecked = false;
-
-    // Przetasowanie tablicy
-    function shuffle(array) {
-        let currentIndex = array.length, randomIndex;
-        let shuffled = [...array];
-        while (currentIndex !== 0) {
-            randomIndex = Math.floor(Math.random() * currentIndex);
-            currentIndex--;
-            [shuffled[currentIndex], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[currentIndex]];
-        }
-        return shuffled;
-    }
-
-    let shuffledAnswers = shuffle(data);
-
-    function init() {
-        const qList = document.getElementById('questions-list');
-        const aList = document.getElementById('answers-list');
-        
-        qList.innerHTML = '';
-        aList.innerHTML = '';
-        userPairs = {};
-        selectedQuestion = null;
-        selectedAnswer = null;
-        isChecked = false;
-
-        document.getElementById('feedback').style.display = 'none';
-
-        // Renderowanie pytań
-        data.forEach(item => {
-            const qCard = document.createElement('div');
-            qCard.className = 'card-item';
-            qCard.dataset.id = item.id;
-            qCard.onclick = () => selectQuestion(item.id);
-
-            qCard.innerHTML = `
-                <div class="item-text">
-                    ${item.question}
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <button class="audio-btn" onclick="speak('${item.question.replace(/^\d+\.\s*/, '')}', event)" title="Posłuchaj wymowy">
-                        🔊
-                    </button>
-                    <span class="pair-badge" id="q-badge-${item.id}">-</span>
-                </div>
-            `;
-            qList.appendChild(qCard);
-        });
-
-        // Renderowanie odpowiedzi (przetasowanych)
-        shuffledAnswers.forEach(item => {
-            const aCard = document.createElement('div');
-            aCard.className = 'card-item';
-            aCard.dataset.id = item.id;
-            aCard.onclick = () => selectAnswer(item.id);
-
-            aCard.innerHTML = `
-                <div class="item-text">
-                    ${item.answer}
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <button class="audio-btn" onclick="speak('${item.answer.replace(/^[A-Z]\.\s*/, '')}', event)" title="Posłuchaj wymowy">
-                        🔊
-                    </button>
-                    <span class="pair-badge" id="a-badge-${item.id}">-</span>
-                </div>
-            `;
-            aList.appendChild(aCard);
-        });
-    }
-
-    function selectQuestion(id) {
-        if (isChecked) return;
-
-        // Jeśli kliknięto już wybrane pytanie, odznacz
-        if (selectedQuestion === id) {
-            selectedQuestion = null;
-            updateSelectionStyles();
-            return;
-        }
-
-        selectedQuestion = id;
-        
-        // Jeśli wybrano już odpowiedź, utwórz parę
-        if (selectedAnswer !== null) {
-            makePair(selectedQuestion, selectedAnswer);
-            selectedQuestion = null;
-            selectedAnswer = null;
-        }
-        
-        updateSelectionStyles();
-    }
-
-    function selectAnswer(id) {
-        if (isChecked) return;
-
-        // Jeśli kliknięto już wybraną odpowiedź, odznacz
-        if (selectedAnswer === id) {
-            selectedAnswer = null;
-            updateSelectionStyles();
-            return;
-        }
-
-        selectedAnswer = id;
-
-        // Jeśli wybrano już pytanie, utwórz parę
-        if (selectedQuestion !== null) {
-            makePair(selectedQuestion, selectedAnswer);
-            selectedQuestion = null;
-            selectedAnswer = null;
-        }
-
-        updateSelectionStyles();
-    }
-
-    function makePair(qId, aId) {
-        // Usuń istniejące powiązania dla tego pytania lub odpowiedzi
-        for (let q in userPairs) {
-            if (userPairs[q] === aId) {
-                delete userPairs[q];
-            }
-        }
-        userPairs[qId] = aId;
-        updateBadges();
-    }
-
-    function updateBadges() {
-        // Zresetuj wszystkie badge
-        data.forEach(item => {
-            const qBadge = document.getElementById(`q-badge-${item.id}`);
-            const aBadge = document.getElementById(`a-badge-${item.id}`);
-            qBadge.innerText = '-';
-            qBadge.style.backgroundColor = '#e2e8f0';
-            qBadge.style.color = '#475569';
-            aBadge.innerText = '-';
-            aBadge.style.backgroundColor = '#e2e8f0';
-            aBadge.style.color = '#475569';
-        });
-
-        // Ustaw nowe badge na podstawie userPairs
-        let index = 1;
-        for (let qId in userPairs) {
-            const aId = userPairs[qId];
-            const qBadge = document.getElementById(`q-badge-${qId}`);
-            const aBadge = document.getElementById(`a-badge-${aId}`);
-            
-            if (qBadge && aBadge) {
-                qBadge.innerText = index;
-                qBadge.style.backgroundColor = '#6366f1';
-                qBadge.style.color = '#ffffff';
-
-                aBadge.innerText = index;
-                aBadge.style.backgroundColor = '#6366f1';
-                aBadge.style.color = '#ffffff';
-            }
-            index++;
-        }
-    }
-
-    function updateSelectionStyles() {
-        document.querySelectorAll('#questions-list .card-item').forEach(card => {
-            const id = parseInt(card.dataset.id);
-            if (id === selectedQuestion) {
-                card.classList.add('selected');
-            } else {
-                card.classList.remove('selected');
-            }
-        });
-
-        document.querySelectorAll('#answers-list .card-item').forEach(card => {
-            const id = parseInt(card.dataset.id);
-            if (id === selectedAnswer) {
-                card.classList.add('selected');
-            } else {
-                card.classList.remove('selected');
-            }
-        });
-    }
-
-    function checkAnswers() {
-        if (Object.keys(userPairs).length < data.length) {
-            const feedback = document.getElementById('feedback');
-            feedback.className = 'feedback-box error';
-            feedback.innerText = '⚠️ Połącz wszystkie pary przed sprawdzeniem!';
-            feedback.style.display = 'block';
-            return;
-        }
-
-        isChecked = true;
-        let correctCount = 0;
-
-        // Oznaczenie kart
-        document.querySelectorAll('#questions-list .card-item').forEach(card => {
-            const qId = parseInt(card.dataset.id);
-            const aId = userPairs[qId];
-
-            if (qId === aId) {
-                card.classList.add('correct');
-                correctCount++;
-            } else {
-                card.classList.add('incorrect');
-            }
-        });
-
-        document.querySelectorAll('#answers-list .card-item').forEach(card => {
-            const aId = parseInt(card.dataset.id);
-            // Znajdź pytanie przypisane do tej odpowiedzi
-            let isCorrect = false;
-            for (let qId in userPairs) {
-                if (parseInt(userPairs[qId]) === aId && parseInt(qId) === aId) {
-                    isCorrect = true;
-                    break;
+                if (title.includes(input) || content.includes(input)) {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
                 }
-            }
+            });
 
-            if (isCorrect) {
-                card.classList.add('correct');
+            if (visibleCount === 0) {
+                noResults.style.display = 'block';
             } else {
-                card.classList.add('incorrect');
+                noResults.style.display = 'none';
             }
-        });
-
-        const feedback = document.getElementById('feedback');
-        feedback.style.display = 'block';
-
-        if (correctCount === data.length) {
-            feedback.className = 'feedback-box success';
-            feedback.innerHTML = `🎉 Gratulacje! Wszystkie odpowiedzi są poprawne (${correctCount}/${data.length})!`;
-        } else {
-            feedback.className = 'feedback-box error';
-            feedback.innerHTML = `❌ Poprawne połączenia: ${correctCount} z ${data.length}. Spróbuj ponownie!`;
         }
-    }
-
-    function resetExercise() {
-        document.querySelectorAll('.card-item').forEach(card => {
-            card.className = 'card-item';
-        });
-        shuffledAnswers = shuffle(data);
-        init();
-    }
-
-    function showSolution() {
-        resetExercise();
-        isChecked = true;
-        
-        data.forEach(item => {
-            userPairs[item.id] = item.id;
-        });
-
-        updateBadges();
-
-        document.querySelectorAll('.card-item').forEach(card => {
-            card.classList.add('correct');
-        });
-
-        const feedback = document.getElementById('feedback');
-        feedback.className = 'feedback-box success';
-        feedback.innerHTML = '✨ Oto poprawne rozwiązanie!';
-        feedback.style.display = 'block';
-    }
-
-    function speak(text, event) {
-        event.stopPropagation();
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel(); // zatrzymaj poprzednie czytanie
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'pl-PL';
-            utterance.rate = 0.9; // lekko zwolnione tempo dla celów edukacyjnych
-            window.speechSynthesis.speak(utterance);
-        } else {
-            alert('Twoja przeglądarka nie wspiera syntezatora mowy.');
-        }
-    }
-
-    // Inicjalizacja przy załadowaniu
-    window.onload = init;
-</script>
+    </script>
 
 </body>
 </html>
