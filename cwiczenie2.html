@@ -98,11 +98,24 @@
 
     function initPairBadges() {
         document.querySelectorAll('.card-item').forEach(item => {
+            let controls = item.querySelector('.card-controls');
+            const audioButton = item.querySelector('.audio-btn');
+
+            if (!controls) {
+                controls = document.createElement('div');
+                controls.className = 'card-controls';
+                item.appendChild(controls);
+            }
+
+            if (audioButton && audioButton.parentElement !== controls) {
+                controls.appendChild(audioButton);
+            }
+
             if (!item.querySelector('.pair-badge')) {
                 const badge = document.createElement('span');
                 badge.className = 'pair-badge';
                 badge.textContent = '-';
-                item.appendChild(badge);
+                controls.appendChild(badge);
             }
         });
     }
