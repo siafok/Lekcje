@@ -159,18 +159,15 @@
             setPairNumber(leftEl, rightEl, nextPairNumber++);
             leftEl.classList.replace('selected', 'correct');
             rightEl.classList.replace('selected', 'correct');
-            
-            setTimeout(() => {
-                leftEl.classList.replace('correct', 'matched');
-                rightEl.classList.replace('correct', 'matched');
-                matchedPairs++;
-                
-                if (matchedPairs === totalPairs) {
-                    feedbackBox.textContent = "Świetnie! Wszystkie polecenia zostały dopasowane prawidłowo.";
-                    feedbackBox.className = "feedback-box success";
-                    feedbackBox.classList.add('visible');
-                }
-            }, 500);
+            leftEl.classList.add('matched');
+            rightEl.classList.add('matched');
+            matchedPairs++;
+
+            if (matchedPairs === totalPairs) {
+                feedbackBox.textContent = "Świetnie! Wszystkie polecenia zostały dopasowane prawidłowo.";
+                feedbackBox.className = "feedback-box success";
+                feedbackBox.classList.add('visible');
+            }
         } else {
             leftEl.classList.replace('selected', 'incorrect');
             rightEl.classList.replace('selected', 'incorrect');
