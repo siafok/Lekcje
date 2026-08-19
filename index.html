@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Język polski – ćwiczenia interaktywne</title>
+    <!-- Zewnętrzny arkusz stylów -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="index-container">
+        <header class="index-header">
+            <h1>Język polski – ćwiczenia</h1>
+            <p>Wybierz ćwiczenie z listy i przejdź do nauki 😉</p>
+        </header>
+
+        <!-- Wyszukiwarka ćwiczeń -->
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Szukaj ćwiczenia (np. dopasowywanie, gramatyka)..." onkeyup="filterExercises()">
+        </div>
+
+        <!-- Lista ćwiczeń -->
+        <div class="grid" id="exerciseGrid">
+
+            <!-- Ćwieczenie 1 -->
+            <div class="index-card" data-title="przedstawianie słownictwo">
+                <div>
+                    <span class="badge">Słownictwo</span> <span class="badge">A1</span>
+                    <h2>Ćwiczenie 1</h2>
+                    <p>Przedstawianie się</p>
+                </div>
+                <a href="cwiczenie1.html" class="btn btn-primary">Otwórz</a>
+            </div>
+            
+            <!-- Ćwieczenie 2 -->
+            <div class="index-card" data-title="polecenia lekcje słownictwo">
+                <div>
+                    <span class="badge">Słownictwo</span> <span class="badge">A1</span>
+                    <h2>Ćwiczenie 2</h2>
+                    <p>Polecenia na lekcji</p>
+                </div>
+                <a href="cwiczenie2.html" class="btn btn-primary">Otwórz</a>
+            </div>
+
+            <div class="no-results" id="noResults">
+                Nie znaleziono ćwiczenia pasującego do wyszukiwania.
+            </div>
+
+            <div class="no-results" id="noResults">
+                Nie znaleziono ćwiczenia pasującego do wyszukiwania.
+            </div>
+
+        </div>
+
+        <footer>
+            <p>&copy; siafok</p>
+        </footer>
+    </div>
+
+    <script>
+        function filterExercises() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.index-card');
+            const noResults = document.getElementById('noResults');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const title = card.getAttribute('data-title').toLowerCase();
+                const content = card.innerText.toLowerCase();
+
+                if (title.includes(input) || content.includes(input)) {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            if (visibleCount === 0) {
+                noResults.style.display = 'block';
+            } else {
+                noResults.style.display = 'none';
+            }
+        }
+    </script>
+
+</body>
+</html>

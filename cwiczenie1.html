@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ćwiczenie 1: Dopasuj pytanie do odpowiedzi - Lekcja 1</title>
+    <!-- Zewnętrzny arkusz stylów -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="exercise-wrapper">
+    <div class="app-container">
+        <div class="header">
+            <span class="badge">Język polski A1</span>
+            <h1>Ćwiczenie 1</h1>
+            <p>Dopasuj pytania lub zwroty do odpowiedzi</p>
+        </div>
+
+        <div class="instructions">
+            💡 Kliknij w pierwszej kolumnie, a potem w drugiej. Aby posłuchać, kliknij głośnik.
+        </div>
+
+        <div class="matching-grid">
+            <!-- Lewa kolumna: Pytania / Zwroty -->
+            <div>
+                <div class="column-title">
+                    <span>🗩 Pytanie / Zwrot</span>
+                </div>
+                <div class="item-list" id="questions-list">
+                    <!-- Wygenerowane dynamicznie -->
+                </div>
+            </div>
+
+            <!-- Prawa kolumna: Odpowiedzi -->
+            <div>
+                <div class="column-title">
+                    <span>🗨 Odpowiedź</span>
+                </div>
+                <div class="item-list" id="answers-list">
+                    <!-- Wygenerowane dynamicznie -->
+                </div>
+            </div>
+        </div>
+
+        <div class="feedback-box" id="feedback"></div>
+
+        <div class="actions">
+            <button class="btn btn-primary" id="check-btn" onclick="checkAnswers()">Sprawdź</button>
+            <button class="btn btn-secondary" onclick="resetExercise()">↻ Resetuj</button>
+            <button class="btn btn-secondary" onclick="showSolution()">Pokaż rozwiązanie</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const data = [
+        { id: 1, question: "1. Jak masz na imię?", answer: "C. Mam na imię Tom." },
+        { id: 2, question: "2. Jak się pani nazywa?", answer: "A. Nazywam się Mira Kowalska." },
+        { id: 3, question: "3. Bardzo mi miło.", answer: "B. Miło mi cię poznać." }
+    ];
+
+    let selectedQuestion = null;
+    let selectedAnswer = null;
+    let userPairs = {};
+    let isChecked = false;
+
+    function shuffle(array) {
+        let currentIndex = array.length, randomIndex;
+        let shuffled = [...array];
+        while (currentIndex !== 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [shuffled[currentIndex], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[currentIndex]];
+        }
+        return shuffled;
+    }
+
+    let shuffledAnswers = shuffle(data);
+
+    function init() {
+        const qList = document.getElementById('questions-list');
+        const aList = document.getElementById('answers-list');
+        
+        qList.innerHTML = '';
+        aList.innerHTML = '';
+        userPairs = {};
+        selectedQuestion = null;
+        selectedAnswer = null;
+        isChecked = false;
+
+        document.getElementById('feedback').style.display = 'none';
+
+        data.forEach(item => {
+            const qCard = document.createElement('div');
+            qCard.className = 'card-item';
+            qCard.dataset.id = item.id;
+            qCard.onclick = () => selectQuestion(item.id);
+
+            qCard.innerHTML = `
+                <div class="item-text">
+                    ${item.question}
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <button class="audio-btn" onclick="speak('${item.question.replace(/^\d+\.\s*/, '')}', event)" title="Posłuchaj wymowy">
+                        🔊
+                    </button>
+                    <span class="pair-badge" id="q-badge-${item.id}">-</span>
+                </div>
+            `;
+            qList.appendChild(qCard);
+        });
+
+        shuffledAnswers.forEach(item => {
+            const aCard = document.createElement('div');
+            aCard.className = 'card-item';
+            aCard.dataset.id = item.id;
+            aCard.onclick = () => selectAnswer(item.id);
+
+            aCard.innerHTML = `
+                <div class="item-text">
+                    ${item.answer}
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <button class="audio-btn" onclick="speak('${item.answer.replace(/^[A-Z]\.\s*/, '')}', event)" title="Posłuchaj wymowy">
+                        🔊
+                    </button>
+                    <span class="pair-badge" id="a-badge-${item.id}">-</span>
+                </div>
+            `;
+            aList.appendChild(aCard);
+        });
+    }
+
+    function selectQuestion(id) {
+        if (isChecked) return;
+        if (selectedQuestion === id) {
+            selectedQuestion = null;
+            updateSelectionStyles();
+            return;
+        }
+        selectedQuestion = id;
+        if (selectedAnswer !== null) {
+            makePair(selectedQuestion, selectedAnswer);
+            selectedQuestion = null;
+            selectedAnswer = null;
+        }
+        updateSelectionStyles();
+    }
+
+    function selectAnswer(id) {
+        if (isChecked) return;
+        if (selectedAnswer === id) {
+            selectedAnswer = null;
+            updateSelectionStyles();
+            return;
+        }
+        selectedAnswer = id;
+        if (selectedQuestion !== null) {
+            makePair(selectedQuestion, selectedAnswer);
+            selectedQuestion = null;
+            selectedAnswer = null;
+        }
+        updateSelectionStyles();
+    }
+
+    function makePair(qId, aId) {
+        for (let q in userPairs) {
+            if (userPairs[q] === aId) {
+                delete userPairs[q];
+            }
+        }
+        userPairs[qId] = aId;
+        updateBadges();
+    }
+
+    function updateBadges() {
+        data.forEach(item => {
+            const qBadge = document.getElementById(`q-badge-${item.id}`);
+            const aBadge = document.getElementById(`a-badge-${item.id}`);
+            qBadge.innerText = '-';
+            qBadge.style.backgroundColor = '#e2e8f0';
+            qBadge.style.color = '#475569';
+            aBadge.innerText = '-';
+            aBadge.style.backgroundColor = '#e2e8f0';
+            aBadge.style.color = '#475569';
+        });
+
+        let index = 1;
+        for (let qId in userPairs) {
+            const aId = userPairs[qId];
+            const qBadge = document.getElementById(`q-badge-${qId}`);
+            const aBadge = document.getElementById(`a-badge-${aId}`);
+            
+            if (qBadge && aBadge) {
+                qBadge.innerText = index;
+                qBadge.style.backgroundColor = '#6366f1';
+                qBadge.style.color = '#ffffff';
+                aBadge.innerText = index;
+                aBadge.style.backgroundColor = '#6366f1';
+                aBadge.style.color = '#ffffff';
+            }
+            index++;
+        }
+    }
+
+    function updateSelectionStyles() {
+        document.querySelectorAll('#questions-list .card-item').forEach(card => {
+            const id = parseInt(card.dataset.id);
+            if (id === selectedQuestion) {
+                card.classList.add('selected');
+            } else {
+                card.classList.remove('selected');
+            }
+        });
+
+        document.querySelectorAll('#answers-list .card-item').forEach(card => {
+            const id = parseInt(card.dataset.id);
+            if (id === selectedAnswer) {
+                card.classList.add('selected');
+            } else {
+                card.classList.remove('selected');
+            }
+        });
+    }
+
+    function checkAnswers() {
+        if (Object.keys(userPairs).length < data.length) {
+            const feedback = document.getElementById('feedback');
+            feedback.className = 'feedback-box error';
+            feedback.innerText = '⚠️ Połącz wszystkie pary przed sprawdzeniem!';
+            feedback.style.display = 'block';
+            return;
+        }
+
+        isChecked = true;
+        let correctCount = 0;
+
+        document.querySelectorAll('#questions-list .card-item').forEach(card => {
+            const qId = parseInt(card.dataset.id);
+            const aId = userPairs[qId];
+            if (qId === aId) {
+                card.classList.add('correct');
+                correctCount++;
+            } else {
+                card.classList.add('incorrect');
+            }
+        });
+
+        document.querySelectorAll('#answers-list .card-item').forEach(card => {
+            const aId = parseInt(card.dataset.id);
+            let isCorrect = false;
+            for (let qId in userPairs) {
+                if (parseInt(userPairs[qId]) === aId && parseInt(qId) === aId) {
+                    isCorrect = true;
+                    break;
+                }
+            }
+            if (isCorrect) {
+                card.classList.add('correct');
+            } else {
+                card.classList.add('incorrect');
+            }
+        });
+
+        const feedback = document.getElementById('feedback');
+        feedback.style.display = 'block';
+
+        if (correctCount === data.length) {
+            feedback.className = 'feedback-box success';
+            feedback.innerHTML = `🎉 Gratulacje! Wszystkie odpowiedzi są poprawne (${correctCount}/${data.length})!`;
+        } else {
+            feedback.className = 'feedback-box error';
+            feedback.innerHTML = `❌ Poprawne połączenia: ${correctCount} z ${data.length}. Spróbuj ponownie!`;
+        }
+    }
+
+    function resetExercise() {
+        document.querySelectorAll('.card-item').forEach(card => {
+            card.className = 'card-item';
+        });
+        shuffledAnswers = shuffle(data);
+        init();
+    }
+
+    function showSolution() {
+        resetExercise();
+        isChecked = true;
+        
+        data.forEach(item => {
+            userPairs[item.id] = item.id;
+        });
+
+        updateBadges();
+
+        document.querySelectorAll('.card-item').forEach(card => {
+            card.classList.add('correct');
+        });
+
+        const feedback = document.getElementById('feedback');
+        feedback.className = 'feedback-box success';
+        feedback.innerHTML = '✨ Oto poprawne rozwiązanie!';
+        feedback.style.display = 'block';
+    }
+
+    function speak(text, event) {
+        event.stopPropagation();
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'pl-PL';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert('Twoja przeglądarka nie wspiera syntezatora mowy.');
+        }
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>
