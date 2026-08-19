@@ -80,6 +80,7 @@
 
         <div class="actions">
             <button class="btn btn-secondary" onclick="resetExercise()">↻ Resetuj</button>
+            <button class="btn btn-secondary" onclick="showSolution()">Pokaż</button>
         </div>
     </div>
 </div>
@@ -88,11 +89,30 @@
     let selectedLeft = null;
     let selectedRight = null;
     let matchedPairs = 0;
-    const totalPairs = 6;
+    let nextPairNumber = 1;
+    const totalPairs = 8;
 
     const leftItems = document.querySelectorAll('#left-col .card-item');
     const rightItems = document.querySelectorAll('#right-col .card-item');
     const feedbackBox = document.getElementById('feedback');
+
+    function initPairBadges() {
+        document.querySelectorAll('.card-item').forEach(item => {
+            if (!item.querySelector('.pair-badge')) {
+                const badge = document.createElement('span');
+                badge.className = 'pair-badge';
+                badge.textContent = '-';
+                item.appendChild(badge);
+            }
+        });
+    }
+
+    function setPairNumber(leftItem, rightItem, number) {
+        leftItem.querySelector('.pair-badge').textContent = number;
+        leftItem.querySelector('.pair-badge').classList.add('active');
+        rightItem.querySelector('.pair-badge').textContent = number;
+        rightItem.querySelector('.pair-badge').classList.add('active');
+    }
 
     function handleSelection(item, col) {
         if (item.classList.contains('matched')) return;
@@ -123,6 +143,7 @@
         selectedRight = null;
 
         if (leftMatch === rightMatch) {
+            setPairNumber(leftEl, rightEl, nextPairNumber++);
             leftEl.classList.replace('selected', 'correct');
             rightEl.classList.replace('selected', 'correct');
             
@@ -134,6 +155,7 @@
                 if (matchedPairs === totalPairs) {
                     feedbackBox.textContent = "Świetnie! Wszystkie polecenia zostały dopasowane prawidłowo.";
                     feedbackBox.className = "feedback-box success";
+                    feedbackBox.classList.add('visible');
                 }
             }, 500);
         } else {
@@ -156,9 +178,34 @@
         selectedLeft = null;
         selectedRight = null;
         matchedPairs = 0;
+        nextPairNumber = 1;
+
+        document.querySelectorAll('.pair-badge').forEach(badge => {
+            badge.textContent = '-';
+            badge.classList.remove('active');
+        });
         
         feedbackBox.className = "feedback-box";
-        feedbackBox.style.display = "none";
+        feedbackBox.classList.remove('visible');
+    }
+
+    function showSolution() {
+        resetExercise();
+
+        leftItems.forEach((leftItem, index) => {
+            const matchingItem = Array.from(rightItems).find(rightItem =>
+                rightItem.dataset.match === leftItem.dataset.match
+            );
+
+            setPairNumber(leftItem, matchingItem, index + 1);
+            leftItem.classList.add('correct', 'matched');
+            matchingItem.classList.add('correct', 'matched');
+        });
+
+        matchedPairs = totalPairs;
+        feedbackBox.className = "feedback-box success";
+        feedbackBox.textContent = "✨ Oto poprawne rozwiązanie!";
+        feedbackBox.classList.add('visible');
     }
 
     function speak(text, event) {
@@ -181,6 +228,8 @@
     rightItems.forEach(item => {
         item.addEventListener('click', () => handleSelection(item, 'right'));
     });
+
+    initPairBadges();
 </script>
 
 </body>

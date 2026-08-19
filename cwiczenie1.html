@@ -48,9 +48,8 @@
         <div class="actions">
             <button class="btn btn-primary" id="check-btn" onclick="checkAnswers()">Sprawdź</button>
             <button class="btn btn-secondary" onclick="resetExercise()">↻ Resetuj</button>
-            <button class="btn btn-secondary" onclick="showSolution()">Pokaż rozwiązanie</button>
-        </div>
-    </div>
+            <button class="btn btn-secondary" onclick="showSolution()">Pokaż</button>
+        </div>    </div>
 </div>
 
 <script>
@@ -89,7 +88,7 @@
         selectedAnswer = null;
         isChecked = false;
 
-        document.getElementById('feedback').style.display = 'none';
+        document.getElementById('feedback').classList.remove('visible');
 
         data.forEach(item => {
             const qCard = document.createElement('div');
@@ -101,7 +100,7 @@
                 <div class="item-text">
                     ${item.question}
                 </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
+                <div class="card-controls">
                     <button class="audio-btn" onclick="speak('${item.question.replace(/^\d+\.\s*/, '')}', event)" title="Posłuchaj wymowy">
                         🔊
                     </button>
@@ -121,7 +120,7 @@
                 <div class="item-text">
                     ${item.answer}
                 </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
+                <div class="card-controls">
                     <button class="audio-btn" onclick="speak('${item.answer.replace(/^[A-Z]\.\s*/, '')}', event)" title="Posłuchaj wymowy">
                         🔊
                     </button>
@@ -179,11 +178,9 @@
             const qBadge = document.getElementById(`q-badge-${item.id}`);
             const aBadge = document.getElementById(`a-badge-${item.id}`);
             qBadge.innerText = '-';
-            qBadge.style.backgroundColor = '#e2e8f0';
-            qBadge.style.color = '#475569';
+            qBadge.classList.remove('active');
             aBadge.innerText = '-';
-            aBadge.style.backgroundColor = '#e2e8f0';
-            aBadge.style.color = '#475569';
+            aBadge.classList.remove('active');
         });
 
         let index = 1;
@@ -194,11 +191,9 @@
             
             if (qBadge && aBadge) {
                 qBadge.innerText = index;
-                qBadge.style.backgroundColor = '#6366f1';
-                qBadge.style.color = '#ffffff';
+                qBadge.classList.add('active');
                 aBadge.innerText = index;
-                aBadge.style.backgroundColor = '#6366f1';
-                aBadge.style.color = '#ffffff';
+                aBadge.classList.add('active');
             }
             index++;
         }
@@ -229,7 +224,7 @@
             const feedback = document.getElementById('feedback');
             feedback.className = 'feedback-box error';
             feedback.innerText = '⚠️ Połącz wszystkie pary przed sprawdzeniem!';
-            feedback.style.display = 'block';
+            feedback.classList.add('visible');
             return;
         }
 
@@ -264,7 +259,7 @@
         });
 
         const feedback = document.getElementById('feedback');
-        feedback.style.display = 'block';
+        feedback.classList.add('visible');
 
         if (correctCount === data.length) {
             feedback.className = 'feedback-box success';
@@ -300,7 +295,7 @@
         const feedback = document.getElementById('feedback');
         feedback.className = 'feedback-box success';
         feedback.innerHTML = '✨ Oto poprawne rozwiązanie!';
-        feedback.style.display = 'block';
+        feedback.classList.add('visible');
     }
 
     function speak(text, event) {
