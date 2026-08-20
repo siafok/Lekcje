@@ -111,20 +111,29 @@
                 controls.appendChild(audioButton);
             }
 
-            if (!item.querySelector('.pair-badge')) {
-                const badge = document.createElement('span');
-                badge.className = 'pair-badge';
-                badge.textContent = '+';
-                controls.appendChild(badge);
-            }
         });
     }
 
+    function getOrCreatePairBadge(item) {
+        let badge = item.querySelector('.pair-badge');
+
+        if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'pair-badge';
+            item.querySelector('.card-controls').appendChild(badge);
+        }
+
+        return badge;
+    }
+
     function setPairNumber(leftItem, rightItem, number) {
-        leftItem.querySelector('.pair-badge').textContent = number;
-        leftItem.querySelector('.pair-badge').classList.add('active');
-        rightItem.querySelector('.pair-badge').textContent = number;
-        rightItem.querySelector('.pair-badge').classList.add('active');
+        const leftBadge = getOrCreatePairBadge(leftItem);
+        const rightBadge = getOrCreatePairBadge(rightItem);
+
+        leftBadge.textContent = number;
+        leftBadge.classList.add('active');
+        rightBadge.textContent = number;
+        rightBadge.classList.add('active');
     }
 
     function handleSelection(item, col) {
