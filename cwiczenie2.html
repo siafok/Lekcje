@@ -114,7 +114,6 @@
             if (!item.querySelector('.pair-badge')) {
                 const badge = document.createElement('span');
                 badge.className = 'pair-badge';
-                badge.textContent = '-';
                 controls.appendChild(badge);
             }
         });
@@ -191,7 +190,7 @@
         nextPairNumber = 1;
 
         document.querySelectorAll('.pair-badge').forEach(badge => {
-            badge.textContent = '-';
+            badge.textContent = '';
             badge.classList.remove('active');
         });
         
