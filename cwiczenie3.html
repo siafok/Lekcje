@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ćwiczenie: Przymiotniki – przeciwieństwa</title>
+    <!-- Zewnętrzny arkusz stylów -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="exercise-wrapper">
+    <div class="app-container">
+        <div class="header">
+            <span class="badge">Język polski A1</span>
+            <h1>Przymiotniki – przeciwieństwa</h1>
+            <p>Połącz słowa o przeciwstawnym znaczeniu</p>
+        </div>
+
+        <div class="instructions">
+         💡 Kliknij w pierwszej kolumnie, a potem w drugiej. Aby posłuchać wymowy, kliknij głośnik 🔊
+        </div>
+
+        <div class="matching-grid">
+            <!-- Lewa kolumna -->
+            <div>
+                <div class="column-title">
+                    <span>💬 Przymiotnik</span>
+                </div>
+                <div class="item-list" id="left-list">
+                    <!-- Wygenerowane dynamicznie -->
+                </div>
+            </div>
+
+            <!-- Prawa kolumna -->
+            <div>
+                <div class="column-title">
+                    <span>💬 Przeciwieństwo</span>
+                </div>
+                <div class="item-list" id="right-list">
+                    <!-- Wygenerowane dynamicznie -->
+                </div>
+            </div>
+        </div>
+
+        <div class="feedback-box" id="feedback"></div>
+
+        <div class="actions">
+            <button class="btn btn-primary" id="check-btn" onclick="checkAnswers()">Sprawdź</button>
+            <button class="btn btn-secondary" onclick="resetExercise()">Resetuj</button>
+            <button class="btn btn-secondary" onclick="showSolution()">Pokaż rozwiązanie</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const data = [
+        { id: 1, left: "nowy", right: "stary" },
+        { id: 2, left: "dobry", right: "zły" },
+        { id: 3, left: "duży", right: "mały" }
+    ];
+
+    let selectedLeft = null;
+    let selectedRight = null;
+    let userPairs = {};
+    let isChecked = false;
+
+function shuffle(array) {
+    let currentIndex = array.length, randomIndex;
+    let shuffled = [...array];
+    while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [shuffled[currentIndex], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[currentIndex]];
+    }
+    return shuffled;
+}
+
+// Funkcja gwarantująca, że żaden element nie trafi na swój pierwotny indeks (brak par naprzeciwko siebie)
+function shuffleDerangement(array) {
+    if (array.length <= 1) return [...array];
+    
+    let shuffled;
+    let isAnyInSameRow;
+
+    do {
+        shuffled = shuffle(array);
+        // Sprawdzamy, czy któryś element ma ten sam ID co w pierwotnej tablicy
+        isAnyInSameRow = shuffled.some((item, index) => item.id === array[index].id);
+    } while (isAnyInSameRow);
+
+    return shuffled;
+}
+
+    let shuffledRight = shuffleDerangement(data);
+
+    function init() {
+        const leftList = document.getElementById('left-list');
+        const rightList = document.getElementById('right-list');
+        const feedback = document.getElementById('feedback');
+        
+        leftList.innerHTML = '';
+        rightList.innerHTML = '';
+        userPairs = {};
+        selectedLeft = null;
+        selectedRight = null;
+        isChecked = false;
+
+        feedback.className = 'feedback-box';
+
+        // Renderowanie lewej kolumny
+        data.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'card-item';
+            card.dataset.id = item.id;
+            card.onclick = () => selectLeft(item.id);
+
+            card.innerHTML = `
+                <div class="item-text">
+                    ${item.left}
+                </div>
+                <div class="card-controls">
+                    <button class="audio-btn" onclick="speak('${item.left}', event)" title="Posłuchaj wymowy">
+                        🔊
+                    </button>
+                    <span class="pair-badge" id="l-badge-${item.id}">-</span>
+                </div>
+            `;
+            leftList.appendChild(card);
+        });
+
+        // Renderowanie prawej kolumny (przetasowanej)
+        shuffledRight.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'card-item';
+            card.dataset.id = item.id;
+            card.onclick = () => selectRight(item.id);
+
+            card.innerHTML = `
+                <div class="item-text">
+                    ${item.right}
+                </div>
+                <div class="card-controls">
+                    <button class="audio-btn" onclick="speak('${item.right}', event)" title="Posłuchaj wymowy">
+                        🔊
+                    </button>
+                    <span class="pair-badge" id="r-badge-${item.id}">-</span>
+                </div>
+            `;
+            rightList.appendChild(card);
+        });
+    }
+
+    function selectLeft(id) {
+        if (isChecked) return;
+        if (selectedLeft === id) {
+            selectedLeft = null;
+            updateSelectionStyles();
+            return;
+        }
+        selectedLeft = id;
+        if (selectedRight !== null) {
+            makePair(selectedLeft, selectedRight);
+            selectedLeft = null;
+            selectedRight = null;
+        }
+        updateSelectionStyles();
+    }
+
+    function selectRight(id) {
+        if (isChecked) return;
+        if (selectedRight === id) {
+            selectedRight = null;
+            updateSelectionStyles();
+            return;
+        }
+        selectedRight = id;
+        if (selectedLeft !== null) {
+            makePair(selectedLeft, selectedRight);
+            selectedLeft = null;
+            selectedRight = null;
+        }
+        updateSelectionStyles();
+    }
+
+    function makePair(lId, rId) {
+        for (let l in userPairs) {
+            if (userPairs[l] === rId) {
+                delete userPairs[l];
+            }
+        }
+        userPairs[lId] = rId;
+        updateBadges();
+    }
+
+    function updateBadges() {
+        data.forEach(item => {
+            const lBadge = document.getElementById(`l-badge-${item.id}`);
+            const rBadge = document.getElementById(`r-badge-${item.id}`);
+            lBadge.innerText = '-';
+            lBadge.classList.remove('active');
+            rBadge.innerText = '-';
+            rBadge.classList.remove('active');
+        });
+
+        let index = 1;
+        for (let lId in userPairs) {
+            const rId = userPairs[lId];
+            const lBadge = document.getElementById(`l-badge-${lId}`);
+            const rBadge = document.getElementById(`r-badge-${rId}`);
+            
+            if (lBadge && rBadge) {
+                lBadge.innerText = index;
+                lBadge.classList.add('active');
+                rBadge.innerText = index;
+                rBadge.classList.add('active');
+            }
+            index++;
+        }
+    }
+
+    function updateSelectionStyles() {
+        document.querySelectorAll('#left-list .card-item').forEach(card => {
+            const id = parseInt(card.dataset.id);
+            if (id === selectedLeft) {
+                card.classList.add('selected');
+            } else {
+                card.classList.remove('selected');
+            }
+        });
+
+        document.querySelectorAll('#right-list .card-item').forEach(card => {
+            const id = parseInt(card.dataset.id);
+            if (id === selectedRight) {
+                card.classList.add('selected');
+            } else {
+                card.classList.remove('selected');
+            }
+        });
+    }
+
+    function checkAnswers() {
+        const feedback = document.getElementById('feedback');
+        
+        if (Object.keys(userPairs).length < data.length) {
+            feedback.className = 'feedback-box visible error';
+            feedback.innerText = '⚠️ Połącz wszystkie pary przed sprawdzeniem!';
+            return;
+        }
+
+        isChecked = true;
+        let correctCount = 0;
+
+        document.querySelectorAll('#left-list .card-item').forEach(card => {
+            const lId = parseInt(card.dataset.id);
+            const rId = userPairs[lId];
+            if (lId === rId) {
+                card.classList.add('correct');
+                correctCount++;
+            } else {
+                card.classList.add('incorrect');
+            }
+        });
+
+        document.querySelectorAll('#right-list .card-item').forEach(card => {
+            const rId = parseInt(card.dataset.id);
+            let isCorrect = false;
+            for (let lId in userPairs) {
+                if (parseInt(userPairs[lId]) === rId && parseInt(lId) === rId) {
+                    isCorrect = true;
+                    break;
+                }
+            }
+            if (isCorrect) {
+                card.classList.add('correct');
+            } else {
+                card.classList.add('incorrect');
+            }
+        });
+
+        if (correctCount === data.length) {
+            feedback.className = 'feedback-box visible success';
+            feedback.innerHTML = `🎉 Gratulacje! Wszystkie pary są poprawne (${correctCount}/${data.length})!`;
+        } else {
+            feedback.className = 'feedback-box visible error';
+            feedback.innerHTML = `❌ Poprawne połączenia: ${correctCount} z ${data.length}. Spróbuj ponownie!`;
+        }
+    }
+
+    function resetExercise() {
+        document.querySelectorAll('.card-item').forEach(card => {
+            card.className = 'card-item';
+        });
+        shuffledRight = shuffleDerangement(data);
+        init();
+    }
+
+    function showSolution() {
+        resetExercise();
+        isChecked = true;
+        
+        data.forEach(item => {
+            userPairs[item.id] = item.id;
+        });
+
+        updateBadges();
+
+        document.querySelectorAll('.card-item').forEach(card => {
+            card.classList.add('correct');
+        });
+
+        const feedback = document.getElementById('feedback');
+        feedback.className = 'feedback-box visible success';
+        feedback.innerHTML = '✨ Oto poprawne rozwiązanie!';
+    }
+
+    function speak(text, event) {
+        event.stopPropagation();
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'pl-PL';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert('Twoja przeglądarka nie wspiera syntezatora mowy.');
+        }
+    }
+
+    window.onload = init;
+</script>
+
+</body>
+</html>
