@@ -123,7 +123,6 @@ function shuffleDerangement(array) {
                     <button class="audio-btn" onclick="speak('${item.left}', event)" title="Posłuchaj wymowy">
                         🔊
                     </button>
-                    <span class="pair-badge" id="l-badge-${item.id}">-</span>
                 </div>
             `;
             leftList.appendChild(card);
@@ -144,7 +143,6 @@ function shuffleDerangement(array) {
                     <button class="audio-btn" onclick="speak('${item.right}', event)" title="Posłuchaj wymowy">
                         🔊
                     </button>
-                    <span class="pair-badge" id="r-badge-${item.id}">-</span>
                 </div>
             `;
             rightList.appendChild(card);
@@ -185,6 +183,16 @@ function shuffleDerangement(array) {
         updateSelectionStyles();
     }
 
+    function getOrCreatePairBadge(card) {
+        let badge = card.querySelector('.pair-badge');
+        if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'pair-badge';
+            card.querySelector('.card-controls').appendChild(badge);
+        }
+        return badge;
+    }
+
     function makePair(lId, rId) {
         const leftCard = document.querySelector(`#left-list .card-item[data-id="${lId}"]`);
         const rightCard = document.querySelector(`#right-list .card-item[data-id="${rId}"]`);
@@ -196,12 +204,11 @@ function shuffleDerangement(array) {
             leftCard.classList.add('correct', 'matched');
             rightCard.classList.add('correct', 'matched');
 
-            const leftBadge = document.getElementById(`l-badge-${lId}`);
-            const rightBadge = document.getElementById(`r-badge-${rId}`);
-            leftBadge.innerText = nextPairNumber;
-            rightBadge.innerText = nextPairNumber;
-            leftBadge.classList.add('active');
-            rightBadge.classList.add('active');
+            [leftCard, rightCard].forEach(card => {
+                const badge = getOrCreatePairBadge(card);
+                badge.textContent = nextPairNumber;
+                badge.classList.add('active');
+            });
             nextPairNumber++;
             matchedPairs++;
 
@@ -252,15 +259,16 @@ function shuffleDerangement(array) {
     function showSolution() {
         resetExercise();
         data.forEach((item, index) => {
-            document.querySelector(`#left-list .card-item[data-id="${item.id}"]`).classList.add('correct', 'matched');
-            document.querySelector(`#right-list .card-item[data-id="${item.id}"]`).classList.add('correct', 'matched');
+            const leftCard = document.querySelector(`#left-list .card-item[data-id="${item.id}"]`);
+            const rightCard = document.querySelector(`#right-list .card-item[data-id="${item.id}"]`);
+            leftCard.classList.add('correct', 'matched');
+            rightCard.classList.add('correct', 'matched');
 
-            const leftBadge = document.getElementById(`l-badge-${item.id}`);
-            const rightBadge = document.getElementById(`r-badge-${item.id}`);
-            leftBadge.innerText = index + 1;
-            rightBadge.innerText = index + 1;
-            leftBadge.classList.add('active');
-            rightBadge.classList.add('active');
+            [leftCard, rightCard].forEach(card => {
+                const badge = getOrCreatePairBadge(card);
+                badge.textContent = index + 1;
+                badge.classList.add('active');
+            });
         });
         matchedPairs = data.length;
 

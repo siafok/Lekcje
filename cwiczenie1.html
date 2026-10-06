@@ -118,7 +118,6 @@
                     <button class="audio-btn" onclick="speak('${item.question.replace(/^\d+\.\s*/, '')}', event)" title="Posłuchaj wymowy">
                         🔊
                     </button>
-                    <span class="pair-badge" id="q-badge-${item.id}">-</span>
                 </div>
             `;
             qList.appendChild(qCard);
@@ -138,7 +137,6 @@
                     <button class="audio-btn" onclick="speak('${item.answer.replace(/^[A-Z]\.\s*/, '')}', event)" title="Posłuchaj wymowy">
                         🔊
                     </button>
-                    <span class="pair-badge" id="a-badge-${item.id}">-</span>
                 </div>
             `;
             aList.appendChild(aCard);
@@ -179,6 +177,16 @@
         updateSelectionStyles();
     }
 
+    function getOrCreatePairBadge(card) {
+        let badge = card.querySelector('.pair-badge');
+        if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'pair-badge';
+            card.querySelector('.card-controls').appendChild(badge);
+        }
+        return badge;
+    }
+
     function makePair(qId, aId) {
         const questionCard = document.querySelector(`#questions-list .card-item[data-id="${qId}"]`);
         const answerCard = document.querySelector(`#answers-list .card-item[data-id="${aId}"]`);
@@ -190,12 +198,11 @@
             questionCard.classList.add('correct', 'matched');
             answerCard.classList.add('correct', 'matched');
 
-            const questionBadge = document.getElementById(`q-badge-${qId}`);
-            const answerBadge = document.getElementById(`a-badge-${aId}`);
-            questionBadge.innerText = nextPairNumber;
-            answerBadge.innerText = nextPairNumber;
-            questionBadge.classList.add('active');
-            answerBadge.classList.add('active');
+            [questionCard, answerCard].forEach(card => {
+                const badge = getOrCreatePairBadge(card);
+                badge.textContent = nextPairNumber;
+                badge.classList.add('active');
+            });
             nextPairNumber++;
             matchedPairs++;
 
@@ -247,15 +254,16 @@
     function showSolution() {
         resetExercise();
         data.forEach((item, index) => {
-            document.querySelector(`#questions-list .card-item[data-id="${item.id}"]`).classList.add('correct', 'matched');
-            document.querySelector(`#answers-list .card-item[data-id="${item.id}"]`).classList.add('correct', 'matched');
+            const questionCard = document.querySelector(`#questions-list .card-item[data-id="${item.id}"]`);
+            const answerCard = document.querySelector(`#answers-list .card-item[data-id="${item.id}"]`);
+            questionCard.classList.add('correct', 'matched');
+            answerCard.classList.add('correct', 'matched');
 
-            const questionBadge = document.getElementById(`q-badge-${item.id}`);
-            const answerBadge = document.getElementById(`a-badge-${item.id}`);
-            questionBadge.innerText = index + 1;
-            answerBadge.innerText = index + 1;
-            questionBadge.classList.add('active');
-            answerBadge.classList.add('active');
+            [questionCard, answerCard].forEach(card => {
+                const badge = getOrCreatePairBadge(card);
+                badge.textContent = index + 1;
+                badge.classList.add('active');
+            });
         });
         matchedPairs = data.length;
 
