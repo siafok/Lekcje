@@ -47,10 +47,9 @@
         <div class="feedback-box" id="feedback"></div>
 
         <div class="actions">
-            <button class="btn btn-primary" id="check-btn" onclick="checkAnswers()">Sprawdź</button>
             <button class="btn btn-secondary" onclick="resetExercise()">↻ Resetuj</button>
             <button class="btn btn-secondary" onclick="showSolution()">Pokaż</button>
-        </div>    </div>
+        </div>
 </div>
 
 <script>
@@ -62,8 +61,8 @@
 
     let selectedQuestion = null;
     let selectedAnswer = null;
-    let userPairs = {};
-    let isChecked = false;
+    let matchedPairs = 0;
+    let nextPairNumber = 1;
 
     function shuffle(array) {
         let currentIndex = array.length, randomIndex;
@@ -84,12 +83,12 @@
         
         qList.innerHTML = '';
         aList.innerHTML = '';
-        userPairs = {};
         selectedQuestion = null;
         selectedAnswer = null;
-        isChecked = false;
+        matchedPairs = 0;
+        nextPairNumber = 1;
 
-        document.getElementById('feedback').classList.remove('visible');
+        document.getElementById('feedback').className = 'feedback-box';
 
         data.forEach(item => {
             const qCard = document.createElement('div');
@@ -133,7 +132,8 @@
     }
 
     function selectQuestion(id) {
-        if (isChecked) return;
+        const card = document.querySelector(`#questions-list .card-item[data-id="${id}"]`);
+        if (card.classList.contains('matched')) return;
         if (selectedQuestion === id) {
             selectedQuestion = null;
             updateSelectionStyles();
@@ -149,7 +149,8 @@
     }
 
     function selectAnswer(id) {
-        if (isChecked) return;
+        const card = document.querySelector(`#answers-list .card-item[data-id="${id}"]`);
+        if (card.classList.contains('matched')) return;
         if (selectedAnswer === id) {
             selectedAnswer = null;
             updateSelectionStyles();
@@ -165,38 +166,39 @@
     }
 
     function makePair(qId, aId) {
-        for (let q in userPairs) {
-            if (userPairs[q] === aId) {
-                delete userPairs[q];
-            }
-        }
-        userPairs[qId] = aId;
-        updateBadges();
-    }
+        const questionCard = document.querySelector(`#questions-list .card-item[data-id="${qId}"]`);
+        const answerCard = document.querySelector(`#answers-list .card-item[data-id="${aId}"]`);
+        selectedQuestion = null;
+        selectedAnswer = null;
+        updateSelectionStyles();
 
-    function updateBadges() {
-        data.forEach(item => {
-            const qBadge = document.getElementById(`q-badge-${item.id}`);
-            const aBadge = document.getElementById(`a-badge-${item.id}`);
-            qBadge.innerText = '-';
-            qBadge.classList.remove('active');
-            aBadge.innerText = '-';
-            aBadge.classList.remove('active');
-        });
+        if (qId === aId) {
+            questionCard.classList.add('correct', 'matched');
+            answerCard.classList.add('correct', 'matched');
 
-        let index = 1;
-        for (let qId in userPairs) {
-            const aId = userPairs[qId];
-            const qBadge = document.getElementById(`q-badge-${qId}`);
-            const aBadge = document.getElementById(`a-badge-${aId}`);
-            
-            if (qBadge && aBadge) {
-                qBadge.innerText = index;
-                qBadge.classList.add('active');
-                aBadge.innerText = index;
-                aBadge.classList.add('active');
+            const questionBadge = document.getElementById(`q-badge-${qId}`);
+            const answerBadge = document.getElementById(`a-badge-${aId}`);
+            questionBadge.innerText = nextPairNumber;
+            answerBadge.innerText = nextPairNumber;
+            questionBadge.classList.add('active');
+            answerBadge.classList.add('active');
+            nextPairNumber++;
+            matchedPairs++;
+
+            if (matchedPairs === data.length) {
+                const feedback = document.getElementById('feedback');
+                feedback.className = 'feedback-box success';
+                feedback.innerText = 'Świetnie! Wszystkie pary zostały dopasowane prawidłowo.';
+                feedback.classList.add('visible');
             }
-            index++;
+        } else {
+            questionCard.classList.add('incorrect');
+            answerCard.classList.add('incorrect');
+
+            setTimeout(() => {
+                questionCard.classList.remove('incorrect');
+                answerCard.classList.remove('incorrect');
+            }, 800);
         }
     }
 
@@ -220,57 +222,6 @@
         });
     }
 
-    function checkAnswers() {
-        if (Object.keys(userPairs).length < data.length) {
-            const feedback = document.getElementById('feedback');
-            feedback.className = 'feedback-box error';
-            feedback.innerText = '⚠️ Połącz wszystkie pary przed sprawdzeniem!';
-            feedback.classList.add('visible');
-            return;
-        }
-
-        isChecked = true;
-        let correctCount = 0;
-
-        document.querySelectorAll('#questions-list .card-item').forEach(card => {
-            const qId = parseInt(card.dataset.id);
-            const aId = userPairs[qId];
-            if (qId === aId) {
-                card.classList.add('correct');
-                correctCount++;
-            } else {
-                card.classList.add('incorrect');
-            }
-        });
-
-        document.querySelectorAll('#answers-list .card-item').forEach(card => {
-            const aId = parseInt(card.dataset.id);
-            let isCorrect = false;
-            for (let qId in userPairs) {
-                if (parseInt(userPairs[qId]) === aId && parseInt(qId) === aId) {
-                    isCorrect = true;
-                    break;
-                }
-            }
-            if (isCorrect) {
-                card.classList.add('correct');
-            } else {
-                card.classList.add('incorrect');
-            }
-        });
-
-        const feedback = document.getElementById('feedback');
-        feedback.classList.add('visible');
-
-        if (correctCount === data.length) {
-            feedback.className = 'feedback-box success';
-            feedback.innerHTML = `🎉 Gratulacje! Wszystkie odpowiedzi są poprawne (${correctCount}/${data.length})!`;
-        } else {
-            feedback.className = 'feedback-box error';
-            feedback.innerHTML = `❌ Poprawne połączenia: ${correctCount} z ${data.length}. Spróbuj ponownie!`;
-        }
-    }
-
     function resetExercise() {
         document.querySelectorAll('.card-item').forEach(card => {
             card.className = 'card-item';
@@ -281,17 +232,18 @@
 
     function showSolution() {
         resetExercise();
-        isChecked = true;
-        
-        data.forEach(item => {
-            userPairs[item.id] = item.id;
-        });
+        data.forEach((item, index) => {
+            document.querySelector(`#questions-list .card-item[data-id="${item.id}"]`).classList.add('correct', 'matched');
+            document.querySelector(`#answers-list .card-item[data-id="${item.id}"]`).classList.add('correct', 'matched');
 
-        updateBadges();
-
-        document.querySelectorAll('.card-item').forEach(card => {
-            card.classList.add('correct');
+            const questionBadge = document.getElementById(`q-badge-${item.id}`);
+            const answerBadge = document.getElementById(`a-badge-${item.id}`);
+            questionBadge.innerText = index + 1;
+            answerBadge.innerText = index + 1;
+            questionBadge.classList.add('active');
+            answerBadge.classList.add('active');
         });
+        matchedPairs = data.length;
 
         const feedback = document.getElementById('feedback');
         feedback.className = 'feedback-box success';

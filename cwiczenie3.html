@@ -11,6 +11,7 @@
 
 <div class="exercise-wrapper">
     <div class="app-container">
+        <a href="index.html" class="home-link">&larr; Strona główna</a>
         <div class="header">
             <span class="badge">Język polski A1</span>
             <h1>Przymiotniki – przeciwieństwa</h1>
@@ -46,9 +47,8 @@
         <div class="feedback-box" id="feedback"></div>
 
         <div class="actions">
-            <button class="btn btn-primary" id="check-btn" onclick="checkAnswers()">Sprawdź</button>
             <button class="btn btn-secondary" onclick="resetExercise()">Resetuj</button>
-            <button class="btn btn-secondary" onclick="showSolution()">Pokaż rozwiązanie</button>
+            <button class="btn btn-secondary" onclick="showSolution()">Pokaż</button>
         </div>
     </div>
 </div>
@@ -62,8 +62,8 @@
 
     let selectedLeft = null;
     let selectedRight = null;
-    let userPairs = {};
-    let isChecked = false;
+    let matchedPairs = 0;
+    let nextPairNumber = 1;
 
 function shuffle(array) {
     let currentIndex = array.length, randomIndex;
@@ -101,10 +101,10 @@ function shuffleDerangement(array) {
         
         leftList.innerHTML = '';
         rightList.innerHTML = '';
-        userPairs = {};
         selectedLeft = null;
         selectedRight = null;
-        isChecked = false;
+        matchedPairs = 0;
+        nextPairNumber = 1;
 
         feedback.className = 'feedback-box';
 
@@ -152,7 +152,8 @@ function shuffleDerangement(array) {
     }
 
     function selectLeft(id) {
-        if (isChecked) return;
+        const card = document.querySelector(`#left-list .card-item[data-id="${id}"]`);
+        if (card.classList.contains('matched')) return;
         if (selectedLeft === id) {
             selectedLeft = null;
             updateSelectionStyles();
@@ -168,7 +169,8 @@ function shuffleDerangement(array) {
     }
 
     function selectRight(id) {
-        if (isChecked) return;
+        const card = document.querySelector(`#right-list .card-item[data-id="${id}"]`);
+        if (card.classList.contains('matched')) return;
         if (selectedRight === id) {
             selectedRight = null;
             updateSelectionStyles();
@@ -184,38 +186,38 @@ function shuffleDerangement(array) {
     }
 
     function makePair(lId, rId) {
-        for (let l in userPairs) {
-            if (userPairs[l] === rId) {
-                delete userPairs[l];
-            }
-        }
-        userPairs[lId] = rId;
-        updateBadges();
-    }
+        const leftCard = document.querySelector(`#left-list .card-item[data-id="${lId}"]`);
+        const rightCard = document.querySelector(`#right-list .card-item[data-id="${rId}"]`);
+        selectedLeft = null;
+        selectedRight = null;
+        updateSelectionStyles();
 
-    function updateBadges() {
-        data.forEach(item => {
-            const lBadge = document.getElementById(`l-badge-${item.id}`);
-            const rBadge = document.getElementById(`r-badge-${item.id}`);
-            lBadge.innerText = '-';
-            lBadge.classList.remove('active');
-            rBadge.innerText = '-';
-            rBadge.classList.remove('active');
-        });
+        if (lId === rId) {
+            leftCard.classList.add('correct', 'matched');
+            rightCard.classList.add('correct', 'matched');
 
-        let index = 1;
-        for (let lId in userPairs) {
-            const rId = userPairs[lId];
-            const lBadge = document.getElementById(`l-badge-${lId}`);
-            const rBadge = document.getElementById(`r-badge-${rId}`);
-            
-            if (lBadge && rBadge) {
-                lBadge.innerText = index;
-                lBadge.classList.add('active');
-                rBadge.innerText = index;
-                rBadge.classList.add('active');
+            const leftBadge = document.getElementById(`l-badge-${lId}`);
+            const rightBadge = document.getElementById(`r-badge-${rId}`);
+            leftBadge.innerText = nextPairNumber;
+            rightBadge.innerText = nextPairNumber;
+            leftBadge.classList.add('active');
+            rightBadge.classList.add('active');
+            nextPairNumber++;
+            matchedPairs++;
+
+            if (matchedPairs === data.length) {
+                const feedback = document.getElementById('feedback');
+                feedback.className = 'feedback-box visible success';
+                feedback.innerText = 'Świetnie! Wszystkie pary zostały dopasowane prawidłowo.';
             }
-            index++;
+        } else {
+            leftCard.classList.add('incorrect');
+            rightCard.classList.add('incorrect');
+
+            setTimeout(() => {
+                leftCard.classList.remove('incorrect');
+                rightCard.classList.remove('incorrect');
+            }, 800);
         }
     }
 
@@ -239,54 +241,6 @@ function shuffleDerangement(array) {
         });
     }
 
-    function checkAnswers() {
-        const feedback = document.getElementById('feedback');
-        
-        if (Object.keys(userPairs).length < data.length) {
-            feedback.className = 'feedback-box visible error';
-            feedback.innerText = '⚠️ Połącz wszystkie pary przed sprawdzeniem!';
-            return;
-        }
-
-        isChecked = true;
-        let correctCount = 0;
-
-        document.querySelectorAll('#left-list .card-item').forEach(card => {
-            const lId = parseInt(card.dataset.id);
-            const rId = userPairs[lId];
-            if (lId === rId) {
-                card.classList.add('correct');
-                correctCount++;
-            } else {
-                card.classList.add('incorrect');
-            }
-        });
-
-        document.querySelectorAll('#right-list .card-item').forEach(card => {
-            const rId = parseInt(card.dataset.id);
-            let isCorrect = false;
-            for (let lId in userPairs) {
-                if (parseInt(userPairs[lId]) === rId && parseInt(lId) === rId) {
-                    isCorrect = true;
-                    break;
-                }
-            }
-            if (isCorrect) {
-                card.classList.add('correct');
-            } else {
-                card.classList.add('incorrect');
-            }
-        });
-
-        if (correctCount === data.length) {
-            feedback.className = 'feedback-box visible success';
-            feedback.innerHTML = `🎉 Gratulacje! Wszystkie pary są poprawne (${correctCount}/${data.length})!`;
-        } else {
-            feedback.className = 'feedback-box visible error';
-            feedback.innerHTML = `❌ Poprawne połączenia: ${correctCount} z ${data.length}. Spróbuj ponownie!`;
-        }
-    }
-
     function resetExercise() {
         document.querySelectorAll('.card-item').forEach(card => {
             card.className = 'card-item';
@@ -297,17 +251,18 @@ function shuffleDerangement(array) {
 
     function showSolution() {
         resetExercise();
-        isChecked = true;
-        
-        data.forEach(item => {
-            userPairs[item.id] = item.id;
-        });
+        data.forEach((item, index) => {
+            document.querySelector(`#left-list .card-item[data-id="${item.id}"]`).classList.add('correct', 'matched');
+            document.querySelector(`#right-list .card-item[data-id="${item.id}"]`).classList.add('correct', 'matched');
 
-        updateBadges();
-
-        document.querySelectorAll('.card-item').forEach(card => {
-            card.classList.add('correct');
+            const leftBadge = document.getElementById(`l-badge-${item.id}`);
+            const rightBadge = document.getElementById(`r-badge-${item.id}`);
+            leftBadge.innerText = index + 1;
+            rightBadge.innerText = index + 1;
+            leftBadge.classList.add('active');
+            rightBadge.classList.add('active');
         });
+        matchedPairs = data.length;
 
         const feedback = document.getElementById('feedback');
         feedback.className = 'feedback-box visible success';
