@@ -75,7 +75,21 @@
         return shuffled;
     }
 
-    let shuffledAnswers = shuffle(data);
+    function shuffleDerangement(array) {
+        if (array.length <= 1) return [...array];
+
+        let shuffled;
+        let hasAnswerInOriginalPosition;
+
+        do {
+            shuffled = shuffle(array);
+            hasAnswerInOriginalPosition = shuffled.some((item, index) => item.id === array[index].id);
+        } while (hasAnswerInOriginalPosition);
+
+        return shuffled;
+    }
+
+    let shuffledAnswers = shuffleDerangement(data);
 
     function init() {
         const qList = document.getElementById('questions-list');
@@ -226,7 +240,7 @@
         document.querySelectorAll('.card-item').forEach(card => {
             card.className = 'card-item';
         });
-        shuffledAnswers = shuffle(data);
+        shuffledAnswers = shuffleDerangement(data);
         init();
     }
 
